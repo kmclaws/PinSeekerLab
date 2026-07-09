@@ -1,0 +1,27 @@
+KC YARDAGE — PWA PACKAGE (chunk-11)
+
+WHAT THIS IS
+Everything needed to host KC Yardage as an installable, offline-capable
+web app. The app itself is index.html — single file, no build step.
+
+HOW TO DEPLOY
+1. Put ALL files in this folder into one directory on any https host
+   (GitHub Pages is the zero-cost option: new repo -> upload these
+   files -> Settings -> Pages -> deploy from main).
+2. Keep the name index.html — the service worker precaches './' and
+   './index.html', so the name matters from day one.
+3. Visit the URL once. Settings -> App shows "Offline copy: Ready"
+   when caching completes. After that it works with zero signal.
+4. Install: Android/desktop Chrome offer a native Install button
+   (also surfaced in Settings -> App). iPhone: Share -> Add to Home
+   Screen — the app walks through it in Settings -> App.
+
+UPDATES
+Edit index.html, bump the CACHE string at the top of sw.js
+(kc-yardage-chunk-11-3 -> the next tag, etc.), re-upload both. Users get the new
+version on their next cold launch — never mid-round.
+
+NO HOSTING YET?
+Opening index.html straight from disk still works exactly like
+Chunk 10 — the service worker and install prompts stay dormant and
+the manifest/icon 404s in the console are harmless.
