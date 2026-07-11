@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Development Environment — Setup Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --fg: #1a1a2e;
+    --bg: #f7f8fa;
+    --card: #ffffff;
+    --border: #e4e7ec;
+    --border-light: #f0f1f4;
+    --muted: #6b7280;
+    --muted-light: #9ca3af;
+    --accent: #2563eb;
+    --accent-soft: #eff4ff;
+    --accent-hover: #1d4ed8;
+    --success: #059669;
+    --success-soft: #ecfdf5;
+    --warn: #d97706;
+    --warn-soft: #fffbeb;
+    --error: #dc2626;
+    --error-soft: #fef2f2;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.04);
+    --shadow-md: 0 2px 8px rgba(0,0,0,.06);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,.08);
+    --radius: 8px;
+    --radius-lg: 12px;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    --mono: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font);
+    color: var(--fg);
+    background: var(--bg);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* ── Header ── */
+  .header {
+    padding: 48px 0 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 28px;
+    padding-bottom: 28px;
+  }
+  .header-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: var(--fg);
+    margin-bottom: 8px;
+  }
+  .header p {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.55;
+    max-width: 560px;
+  }
+
+  /* ── Prerequisites ── */
+  .prereqs {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-sm);
+  }
+  .prereqs-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .prereqs ul {
+    list-style: none;
+    display: grid;
+    gap: 8px;
+  }
+  .prereqs li {
+    font-size: 14px;
+    color: var(--fg);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
+  }
+  .prereqs li::before {
+    content: '';
+    display: block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    margin-top: 7px;
+  }
+
+  /* ── Progress bar ── */
+  .progress-bar-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg);
+    padding: 14px 0 10px;
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+  }
+  .progress-label-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+  }
+  .progress-label-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted-light);
+    font-variant-numeric: tabular-nums;
+  }
+  .progress-track {
+    height: 4px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: var(--accent);
+    transition: width 0.4s ease;
+  }
+  .progress-fill.complete { background: var(--success); }
+  .progress-done {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--success);
+  }
+
+  /* ── Phase cards ── */
+  .phase {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    margin-top: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.25s ease;
+  }
+  .phase.open { box-shadow: var(--shadow-md); }
+
+  .phase-header {
+    width: 100%;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    text-align: left;
+    font-family: inherit;
+  }
+  .phase-header:hover { background: var(--bg); }
+
+  .phase-number {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .phase-number.done {
+    background: var(--success-soft);
+    color: var(--success);
+  }
+
+  .phase-info { flex: 1; min-width: 0; }
+  .phase-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--fg);
+    line-height: 1.3;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .phase-done-badge {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--success-soft);
+    color: var(--success);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .phase-subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .phase-mini-progress {
+    margin-top: 6px;
+    height: 3px;
+    background: var(--border-light);
+    border-radius: 99px;
+    overflow: hidden;
+    max-width: 160px;
+  }
+  .phase-mini-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.3s;
+  }
+
+  .phase-chevron {
+    flex-shrink: 0;
+    color: var(--muted-light);
+    transition: transform 0.25s ease;
+  }
+  .phase.open .phase-chevron { transform: rotate(180deg); }
+
+  .phase-body { padding: 0 22px 22px; }
+
+  /* ── Explainer ── */
+  .explainer {
+    background: var(--bg);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--fg);
+    margin-bottom: 8px;
+    border-left: 3px solid var(--border);
+  }
+
+  /* ── Steps ── */
+  .step {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-light);
+    transition: opacity 0.3s;
+  }
+  .step:last-child { border-bottom: none; }
+  .step.checked { opacity: 0.45; }
+
+  .step-header {
+    display: flex;
+    gap: 12px;
+    cursor: pointer;
+    align-items: flex-start;
+  }
+
+  .step-checkbox {
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: all 0.15s;
+    background: var(--card);
+  }
+  .step-checkbox.checked {
+    background: var(--success);
+    border-color: var(--success);
+  }
+  .step-checkbox svg { display: none; }
+  .step-checkbox.checked svg { display: block; }
+
+  .step-label {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--fg);
+    flex: 1;
+  }
+  .step.checked .step-label {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+
+  .step-body {
+    padding-left: 34px;
+    margin-top: 8px;
+  }
+  .step-detail {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--fg);
+    margin-bottom: 8px;
+  }
+
+  /* ── Substeps ── */
+  .substeps {
+    margin: 8px 0;
+    padding-left: 18px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--fg);
+  }
+  .substeps li { margin-bottom: 2px; }
+
+  /* ── Command block ── */
+  .cmd-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--muted-light);
+    margin-bottom: 4px;
+  }
+  .cmd-block {
+    background: #1a1a2e;
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 8px 0;
+  }
+  .cmd-block pre {
+    margin: 0;
+    color: #e2e8f0;
+    font-size: 14px;
+    font-family: var(--mono);
+    white-space: pre-wrap;
+    word-break: break-all;
+    flex: 1;
+    line-height: 1.5;
+  }
+  .cmd-breakdown {
+    margin-top: 6px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 3px 10px;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 0 2px;
+  }
+  .cmd-breakdown code {
+    background: var(--bg);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-weight: 500;
+    color: var(--fg);
+    font-size: 11px;
+    font-family: var(--mono);
+  }
+
+  /* ── Copy button ── */
+  .copy-btn {
+    background: rgba(255,255,255,0.08);
+    color: #94a3b8;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 5px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: var(--font);
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .copy-btn:hover { background: rgba(255,255,255,0.14); color: #cbd5e1; }
+  .copy-btn.copied { background: var(--success); color: #fff; border-color: var(--success); }
+
+  /* ── Callout boxes ── */
+  .callout {
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: 13px;
+    line-height: 1.55;
+    margin-top: 8px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .callout-icon {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+  }
+  .callout.info { background: var(--accent-soft); color: #1e40af; border-left: 3px solid var(--accent); }
+  .callout.success { background: var(--success-soft); color: #065f46; border-left: 3px solid var(--success); }
+  .callout.warn { background: var(--warn-soft); color: #92400e; border-left: 3px solid var(--warn); }
+  .callout.error { background: var(--error-soft); color: #991b1b; border-left: 3px solid var(--error); font-weight: 500; }
+
+  /* ── Visual: icons grid ── */
+  .icon-grid {
+    display: flex;
+    gap: 10px;
+    margin: 10px 0;
+    flex-wrap: wrap;
+  }
+  .icon-card {
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    text-align: center;
+    flex: 1 1 110px;
+    min-width: 110px;
+  }
+  .icon-card-name { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+  .icon-card-desc { font-size: 11px; color: var(--muted); }
+
+  /* ── Visual: mock button ── */
+  .mock-btn-wrap { margin: 10px 0; text-align: center; }
+  .mock-btn {
+    display: inline-block;
+    color: #fff;
+    padding: 12px 28px;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 600;
+    pointer-events: none;
+    box-shadow: var(--shadow-sm);
+    font-family: var(--font);
+  }
+  .mock-btn-caption {
+    font-size: 11px;
+    color: var(--muted-light);
+    margin-top: 6px;
+  }
+
+  /* ── Visual: finder options ── */
+  .finder-options { margin: 10px 0; }
+  .finder-opt {
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    margin-bottom: 6px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 14px;
+  }
+  .finder-opt-letter {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 12px;
+    flex-shrink: 0;
+    color: var(--muted);
+  }
+
+  /* ── Visual: wizard ── */
+  .wizard { margin: 10px 0; }
+  .wizard-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .wizard-row:last-child { border-bottom: none; }
+  .wizard-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 12px;
+    flex-shrink: 0;
+    background: var(--bg);
+    color: var(--muted);
+    border: 1px solid var(--border-light);
+  }
+  .wizard-num.important { background: var(--warn); color: #fff; border-color: var(--warn); }
+  .wizard-screen { font-weight: 600; font-size: 13px; }
+  .wizard-action { font-size: 13px; color: var(--muted); }
+  .wizard-action.important { color: var(--warn); font-weight: 500; }
+
+  /* ── Visual: priority list ── */
+  .priority-list { margin: 10px 0; }
+  .priority-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    margin-bottom: 6px;
+  }
+  .priority-rank {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .priority-name { font-weight: 600; font-size: 14px; }
+  .priority-desc { font-size: 12px; color: var(--muted); }
+  .priority-tag {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* ── Visual: env vars ── */
+  .envvar-block {
+    background: #1a1a2e;
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 8px;
+  }
+  .envvar-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+  .envvar-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: #64748b;
+  }
+  .envvar-name {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: #67e8f9;
+    margin-bottom: 10px;
+  }
+  .envvar-value {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: #fde68a;
+    word-break: break-all;
+  }
+  .envvar-note {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 6px;
+  }
+
+  /* ── Visual: costs ── */
+  .costs-table { margin: 10px 0; }
+  .cost-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 14px;
+  }
+  .cost-amount { font-weight: 600; text-align: right; }
+  .cost-amount.free { color: var(--success); }
+  .cost-note { font-size: 11px; color: var(--muted); }
+  .cost-total {
+    display: flex;
+    justify-content: space-between;
+    padding: 14px;
+    background: var(--bg);
+    border-radius: 0 0 var(--radius) var(--radius);
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  /* ── Appendix sections ── */
+  .appendix {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    margin-top: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+  .appendix summary {
+    padding: 16px 22px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--fg);
+    list-style: none;
+  }
+  .appendix summary::-webkit-details-marker { display: none; }
+  .appendix summary::before {
+    content: '+';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    background: var(--bg);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+  .appendix[open] summary::before { content: '\2212'; }
+  .appendix-body { padding: 0 22px 20px; }
+
+  .trouble-item {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .trouble-item:last-child { border-bottom: none; }
+  .trouble-problem {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--error);
+    margin-bottom: 3px;
+  }
+  .trouble-fix {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--fg);
+  }
+  .trouble-fix strong { color: var(--success); font-weight: 600; }
+
+  .cheat-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .cheat-table th {
+    padding: 10px 8px;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--muted);
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+  }
+  .cheat-table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .cheat-table code {
+    background: #1a1a2e;
+    color: #e2e8f0;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: var(--mono);
+  }
+  .cheat-where { color: var(--muted); font-size: 12px; }
+
+  /* ── Architecture ── */
+  .arch {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    margin-top: 16px;
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+  }
+  .arch-title {
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 12px;
+  }
+  .arch-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+  }
+  .arch-node {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    text-align: center;
+    min-width: 100px;
+  }
+  .arch-node-label { font-weight: 600; font-size: 13px; margin-bottom: 2px; }
+  .arch-node-sub { font-size: 11px; color: var(--muted); }
+  .arch-arrow {
+    color: var(--border);
+    padding: 0 6px;
+    font-size: 18px;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 40px 0 0;
+    font-size: 13px;
+    color: var(--muted-light);
+  }
+</style>
+</head>
+<body>
+
+<div class="container" id="app"></div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════
+const PHASES = [
+  {
+    id: "nodejs",
+    title: "Install Node.js",
+    subtitle: "Runtime prerequisite for all downstream tools",
+    color: "#2563eb",
+    explainer: "Node.js is the runtime environment required before 9Router or OpenCode can function. It provides the JavaScript execution layer these tools depend on — similar to how a JVM is required before running Java applications.",
+    steps: [
+      {
+        id: "open-browser",
+        label: "Open your web browser",
+        detail: "Locate your browser on the desktop or taskbar.",
+        visual: {
+          type: "icons",
+          items: [
+            { name: "Chrome", desc: "Multi-color circle icon" },
+            { name: "Edge", desc: "Blue-green wave icon" },
+            { name: "Firefox", desc: "Orange and purple globe icon" }
+          ]
+        },
+        tip: 'If no browser is visible, click the Windows Start menu, type "edge", and press Enter. Edge is pre-installed on all Windows 10 machines.'
+      },
+      {
+        id: "go-to-nodejs",
+        label: "Navigate to the Node.js website",
+        detail: "Click the address bar at the top of your browser, type the URL below, and press Enter.",
+        command: "nodejs.org",
+        commandLabel: "Enter this URL in the address bar"
+      },
+      {
+        id: "download-nodejs",
+        label: "Download the LTS release",
+        detail: 'Locate and click the green "Download Node.js (LTS)" button. LTS denotes the stable, production-recommended version.',
+        visual: { type: "mockButton", text: "Download Node.js (LTS)", color: "#3e863d" },
+        tip: "A file download will begin. Wait for it to complete — your browser will indicate progress at the bottom of the window."
+      },
+      {
+        id: "run-installer",
+        label: "Open the downloaded installer",
+        detail: 'The file will be named something like "node-v24.x.x-x64.msi" — the exact version number is not important.',
+        visual: {
+          type: "finder",
+          options: [
+            "Click the download notification at the bottom of your browser (Chrome and Edge display downloads there)",
+            'Alternatively, press Windows\u00a0+\u00a0E to open File Explorer, navigate to Downloads, and double-click the file beginning with "node"'
+          ]
+        }
+      },
+      {
+        id: "installer-wizard",
+        label: "Complete the installation wizard",
+        detail: "A setup wizard will appear. Follow each screen as indicated below:",
+        visual: {
+          type: "wizard",
+          screens: [
+            { screen: "Welcome", action: "Click Next" },
+            { screen: "License Agreement", action: "Accept the terms, then click Next" },
+            { screen: "Destination Folder", action: "Leave the default path. Click Next" },
+            { screen: "Custom Setup", action: "No changes needed. Click Next" },
+            { screen: "Tools for Native Modules", action: 'Enable "Automatically install necessary tools" — this is required', important: true },
+            { screen: "Ready to Install", action: "Click Install" },
+            { screen: "Permission Prompt (UAC)", action: "Click Yes to authorize" },
+            { screen: "Installation Progress", action: "Allow 1–3 minutes to complete" },
+            { screen: "Completed", action: "Click Finish" }
+          ]
+        }
+      },
+      {
+        id: "black-window",
+        label: "A command-line window may appear — this is expected",
+        detail: 'If you enabled the native tools option (recommended), a terminal window with scrolling text will open automatically. Do not close it — it is installing required build tools.',
+        tip: 'This process may take 5–10 minutes. When it displays "Press any key to continue..." press any key to close the window.',
+        warning: true
+      },
+      {
+        id: "verify-node",
+        label: "Verify the installation",
+        detail: 'Open Command Prompt: press the Windows key, type "cmd", and select Command Prompt. Run the following checks:',
+        substeps: [
+          'Open Command Prompt (Windows key → type "cmd" → click Command Prompt)',
+          "Execute the verification commands below:"
+        ],
+        command: "node --version",
+        commandLabel: "Verification check 1",
+        expect: "A version number starting with 'v' (e.g., v24.4.0) confirms a successful installation.",
+        followup: {
+          command: "npm --version",
+          commandLabel: "Verification check 2",
+          expect: "Any version number (e.g., 10.9.2) confirms npm is available."
+        },
+        tip: 'If you receive a "not recognized" error, restart your computer and retry. Windows occasionally requires a reboot to update its PATH.'
+      }
+    ]
+  },
+  {
+    id: "terminal",
+    title: "Install Windows Terminal",
+    subtitle: "Modern terminal with full rendering support",
+    color: "#7c3aed",
+    explainer: "The default Command Prompt on Windows 10 lacks support for the rich text rendering that OpenCode requires. Windows Terminal is Microsoft's modern replacement — it handles ANSI colors, Unicode, and GPU-accelerated text natively.",
+    steps: [
+      {
+        id: "open-store",
+        label: "Open the Microsoft Store",
+        detail: 'Click the Windows Start menu, type "Microsoft Store", and open it.',
+        visual: { type: "mockButton", text: "Microsoft Store", color: "#0078d4" }
+      },
+      {
+        id: "search-terminal",
+        label: 'Search for "Windows Terminal"',
+        detail: 'Use the search bar at the top of the Microsoft Store. Type "Windows Terminal" and press Enter.'
+      },
+      {
+        id: "install-terminal",
+        label: "Install the application",
+        detail: 'Select "Windows Terminal" by Microsoft Corporation, then click Get or Install. Installation takes approximately 1–2 minutes.',
+        tip: 'If the button reads "Open" rather than "Get", Windows Terminal is already installed — proceed to the next step.'
+      },
+      {
+        id: "test-terminal",
+        label: "Confirm it launches correctly",
+        detail: 'Press the Windows key, type "Windows Terminal", and open it. A dark terminal window should appear. You can close it for now.',
+        expect: "A clean terminal interface with a blinking cursor confirms successful installation."
+      }
+    ]
+  },
+  {
+    id: "9router",
+    title: "Install 9Router",
+    subtitle: "Intelligent model routing and failover",
+    color: "#0891b2",
+    explainer: "9Router is a local service that acts as an AI model router. When one model reaches its rate limit or capacity, 9Router automatically fails over to the next available model in your configured priority list — ensuring uninterrupted access.",
+    steps: [
+      {
+        id: "open-terminal-9r",
+        label: "Open Windows Terminal",
+        detail: 'Press the Windows key, type "Windows Terminal", and open it.'
+      },
+      {
+        id: "install-9router",
+        label: "Install 9Router globally",
+        detail: "Copy the following command, paste it into the terminal (right-click to paste), and press Enter.",
+        command: "npm install -g 9router",
+        commandLabel: "Run in terminal",
+        commandBreakdown: [
+          { piece: "npm", meaning: "Node.js package manager (installed with Node.js)" },
+          { piece: "install", meaning: "Download and configure the package" },
+          { piece: "-g", meaning: "Install globally (accessible system-wide)" },
+          { piece: "9router", meaning: "The routing service package" }
+        ],
+        tip: "Scrolling text output is normal during installation. Wait for the cursor to reappear. Yellow WARN messages are benign — only red ERROR messages indicate a problem."
+      },
+      {
+        id: "start-9router",
+        label: "Start the 9Router service",
+        detail: "In the same terminal window, run:",
+        command: "9router",
+        commandLabel: "Run in terminal",
+        expect: 'A startup confirmation including a "Dashboard" URL will appear, indicating the service is running.',
+        warning_box: "Important: Keep this terminal window open. Closing it will terminate the 9Router service. Minimize it to the taskbar instead."
+      },
+      {
+        id: "open-dashboard",
+        label: "Access the 9Router Dashboard",
+        detail: "Open your browser and navigate to the address below. This is a local-only interface running on your machine.",
+        command: "localhost:20128",
+        commandLabel: "Enter in browser address bar",
+        expect: 'The dashboard should display "Usage & Analytics" with sidebar navigation including Providers, Combos, and Usage.',
+        tip: "If the page fails to load, verify that the terminal window running 9Router is still active."
+      }
+    ]
+  },
+  {
+    id: "opencode-go",
+    title: "Subscribe to OpenCode Go",
+    subtitle: "$5 introductory / $10 per month — access to 14 AI models",
+    color: "#d97706",
+    explainer: "OpenCode Go provides access to 14 production-grade AI coding models (DeepSeek V4 Pro, GLM 5.2, Kimi K2.7, and others) under a single flat-rate subscription. No per-token billing. The value proposition: users have reported processing 7+ million tokens for under $0.30 with this configuration.",
+    steps: [
+      {
+        id: "go-to-opencode",
+        label: "Navigate to the OpenCode Go page",
+        detail: "Open your browser and go to:",
+        command: "opencode.ai/go",
+        commandLabel: "Enter in browser address bar"
+      },
+      {
+        id: "signup-opencode",
+        label: "Create an account and subscribe",
+        detail: 'Click the sign-up or "Get Started" button. Register with your email, set a password, and enter payment information. The introductory rate is $5 for the first month.'
+      },
+      {
+        id: "get-api-key",
+        label: "Retrieve and securely store your API key",
+        detail: "After registration, you will receive an API key — a credential string in the following format:",
+        command: "sk-oc-xxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        commandLabel: "Example format (your key will contain actual characters)",
+        warning_box: "Store this key securely — in a password manager, encrypted note, or similar. You will need it in subsequent steps. If misplaced, log into opencode.ai and locate it under Settings or API Keys."
+      }
+    ]
+  },
+  {
+    id: "connect",
+    title: "Connect OpenCode Go to 9Router",
+    subtitle: "Configure the provider integration",
+    color: "#059669",
+    explainer: "This step registers your OpenCode Go subscription with 9Router so it can route requests to your provisioned AI models.",
+    steps: [
+      {
+        id: "open-dashboard-2",
+        label: "Open the 9Router Dashboard",
+        detail: "In your browser, navigate to:",
+        command: "localhost:20128",
+        commandLabel: "Dashboard URL (or switch to the existing tab)"
+      },
+      {
+        id: "add-provider",
+        label: "Add OpenCode Go as a provider",
+        substeps: [
+          'Select "Providers" from the left sidebar',
+          'Click "Add Provider" or the + icon',
+          'Select "OpenCode" or "OpenCode Go"',
+          "Paste your API key from the previous phase",
+          "Confirm the Base URL matches the value below"
+        ],
+        command: "https://opencode.ai/zen/go/v1",
+        commandLabel: "Base URL (may be pre-populated)",
+        detail: 'Click "Save" or "Connect" to finalize.'
+      },
+      {
+        id: "verify-provider",
+        label: "Verify the connection",
+        detail: "OpenCode Go should now appear as an active provider with a green status indicator. Available models (DeepSeek V4 Pro, GLM 5.2, etc.) may also be listed.",
+        expect: "A green indicator next to OpenCode Go confirms a successful connection."
+      }
+    ]
+  },
+  {
+    id: "combo",
+    title: "Configure a Model Combo",
+    subtitle: "Priority-based automatic model failover",
+    color: "#db2777",
+    explainer: 'A "Combo" is an ordered priority list of AI models. When the primary model reaches its rate limit, 9Router automatically cascades to the next model in the sequence. This is how the system achieves high token throughput at minimal cost.',
+    steps: [
+      {
+        id: "create-combo",
+        label: "Create a new Combo",
+        substeps: [
+          'Select "Combos" from the left sidebar',
+          'Click "Create New" or the + icon',
+          "Assign a descriptive name (e.g., my-coding-combo)"
+        ],
+        detail: ""
+      },
+      {
+        id: "add-models",
+        label: "Add models in priority order",
+        detail: "Add the following models from highest to lowest priority. 9Router will attempt models from the top of the list first:",
+        visual: {
+          type: "priority",
+          items: [
+            { rank: 1, name: "DeepSeek V4 Pro", desc: "Highest quality — optimal for complex tasks", tag: "Primary" },
+            { rank: 2, name: "DeepSeek V4 Flash", desc: "Lower latency, comparable quality", tag: "Fast" },
+            { rank: 3, name: "GLM 5.2", desc: "Strong reasoning, large context window", tag: "Analytical" },
+            { rank: 4, name: "Kimi K2.7 Code", desc: "Effective for multi-step problems", tag: "Reliable" }
+          ]
+        }
+      },
+      {
+        id: "add-free",
+        label: "Optional: Add free-tier fallback models",
+        detail: 'Return to Providers and add "OpenCode Free" (no API key required). Then append its models to the bottom of your Combo as zero-cost fallbacks.',
+        tip: "This provides a safety net. When paid-tier models are at capacity, free-tier models activate automatically."
+      }
+    ]
+  },
+  {
+    id: "opencode-install",
+    title: "Install OpenCode",
+    subtitle: "The AI-powered development interface",
+    color: "#4f46e5",
+    explainer: "OpenCode is the terminal-based development tool you will use directly. You describe what you need in natural language, and it generates code using the AI models from your OpenCode Go subscription, routed through 9Router.",
+    steps: [
+      {
+        id: "new-terminal",
+        label: "Open a second terminal window",
+        detail: 'Your first terminal is running 9Router — leave it active. Press the Windows key, type "Windows Terminal", and open a new instance.',
+        warning_box: "You should now have two terminal windows: one running 9Router (do not close it), and a new empty window for this step."
+      },
+      {
+        id: "install-opencode",
+        label: "Install OpenCode via npm",
+        detail: "In the new terminal window, run:",
+        command: "npm install -g opencode-ai@latest",
+        commandLabel: "Run in the new terminal window",
+        tip: "Installation typically takes 1–5 minutes. Wait for the cursor to reappear before proceeding.",
+        altMethod: {
+          title: "Alternative installation via Scoop",
+          detail: "If the npm method encounters issues, install via Scoop. First, configure Scoop with these two commands (execute sequentially):",
+          commands: [
+            "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser",
+            "Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression"
+          ],
+          then: "Then install OpenCode:",
+          finalCommand: "scoop install opencode"
+        }
+      },
+      {
+        id: "verify-opencode",
+        label: "Verify the installation",
+        command: "opencode --version",
+        commandLabel: "Run in terminal",
+        detail: "",
+        expect: "A version number confirms successful installation."
+      }
+    ]
+  },
+  {
+    id: "configure",
+    title: "Configure OpenCode to Use 9Router",
+    subtitle: "Final integration — environment variable setup",
+    color: "#ea580c",
+    explainer: "This step configures OpenCode to route all AI requests through 9Router by setting two environment variables. These are persistent system settings that programs reference at runtime.",
+    steps: [
+      {
+        id: "set-env-perm",
+        label: "Set environment variables (one-time configuration)",
+        detail: "Follow these steps to set permanent environment variables:",
+        substeps: [
+          'Press the Windows key, type "environment variables"',
+          'Select "Edit the system environment variables"',
+          'Click "Environment Variables..." at the bottom of the dialog',
+          'Under "User variables" (top section), click "New..." for each variable below'
+        ],
+        visual: {
+          type: "envvars",
+          vars: [
+            { name: "OPENAI_BASE_URL", value: "http://localhost:20128/v1", note: "Routes OpenCode requests through 9Router" },
+            { name: "OPENAI_API_KEY", value: "(your OpenCode Go API key from Phase 4)", note: "Your subscription credential" }
+          ]
+        },
+        detail2: "For each variable: enter the name, paste the value, and click OK. After adding both, close all dialog windows. Then close and reopen your terminal for the changes to take effect."
+      },
+      {
+        id: "create-folder",
+        label: "Create a project directory",
+        detail: "OpenCode operates within a project directory. Create one and navigate into it:",
+        command: 'mkdir C:\\Users\\%USERNAME%\\my-project\ncd C:\\Users\\%USERNAME%\\my-project',
+        commandLabel: "Run these commands sequentially"
+      },
+      {
+        id: "start-opencode",
+        label: "Launch OpenCode",
+        command: "opencode",
+        commandLabel: "Run in terminal",
+        detail: "",
+        expect: "A terminal-based interface with a prompt input at the bottom indicates the tool is ready."
+      },
+      {
+        id: "select-model",
+        label: "Select your AI model",
+        detail: "Within OpenCode, run the following to view available models:",
+        command: "/models",
+        commandLabel: "Execute inside OpenCode",
+        tip: "Recommended: DeepSeek V4 Pro or GLM 5.2 for quality; DeepSeek V4 Flash for speed."
+      },
+      {
+        id: "test-it",
+        label: "Run a test prompt",
+        detail: "Verify the full pipeline is operational with a simple request:",
+        command: 'Create a simple HTML page that says "Hello World" with blue text and a yellow background',
+        commandLabel: "Example test prompt",
+        expect: "If OpenCode begins generating code, the entire stack is functioning correctly."
+      }
+    ]
+  },
+  {
+    id: "autostart",
+    title: "Configure Automatic Startup",
+    subtitle: "Launch 9Router at login without manual intervention",
+    color: "#0d9488",
+    explainer: "By default, 9Router must be started manually after each system restart. This step creates a startup shortcut so it launches automatically when you log in.",
+    steps: [
+      {
+        id: "create-shortcut",
+        label: "Create a startup shortcut",
+        substeps: [
+          "Press Windows\u00a0+\u00a0R to open the Run dialog",
+          'Type shell:startup and press Enter',
+          "A File Explorer window opens — this is your Startup directory",
+          'Right-click in the empty space \u2192 New \u2192 Shortcut',
+          "In the location field, paste the command below:"
+        ],
+        command: "cmd.exe /k 9router",
+        commandLabel: "Shortcut target location",
+        detail: 'Click Next, name the shortcut "9Router", and click Finish.',
+        tip: "9Router will now start automatically in a terminal window at each login. Minimize it to the taskbar."
+      }
+    ]
+  },
+  {
+    id: "done",
+    title: "Setup Summary and Cost Overview",
+    subtitle: "Configuration complete — reference information",
+    color: "#059669",
+    explainer: "",
+    steps: [
+      {
+        id: "check-usage",
+        label: "Monitor usage via the dashboard",
+        detail: 'Navigate to localhost:20128 and select "Usage" from the sidebar. The dashboard displays total requests, token counts, and estimated cost.',
+        tip: 'For reference: a "token" is approximately \u00BE of a word. 1,000 tokens \u2248 750 words. The benchmark screenshot showed 7.7 million tokens processed for approximately $0.27.'
+      },
+      {
+        id: "know-costs",
+        label: "Monthly cost breakdown",
+        detail: "",
+        visual: {
+          type: "costs",
+          items: [
+            { item: "OpenCode Go subscription", cost: "$10/mo", note: "$5 introductory month" },
+            { item: "9Router", cost: "Free", note: "Open source" },
+            { item: "OpenCode", cost: "Free", note: "Open source" },
+            { item: "Node.js", cost: "Free", note: "" },
+            { item: "Windows Terminal", cost: "Free", note: "" }
+          ]
+        }
+      }
+    ]
+  }
+];
+
+const TROUBLESHOOTING = [
+  { problem: '"9router is not recognized as a command"', fix: "Close the terminal, open a new instance, and retry. If the issue persists, re-run: npm install -g 9router" },
+  { problem: '"node is not recognized"', fix: "Restart your computer. Windows sometimes requires a reboot to update its PATH with newly installed programs." },
+  { problem: "OpenCode cannot connect to models", fix: "Verify: (1) 9Router is running in its terminal window, (2) environment variables are configured, (3) your API key is correct, (4) localhost:20128 loads in your browser." },
+  { problem: "9Router dashboard does not load", fix: 'Confirm 9Router is running. For "port in use" errors, try: 9router --port 20129 (then update OPENAI_BASE_URL accordingly).' },
+  { problem: '"EPERM" or permission errors', fix: 'Right-click Windows Terminal and select "Run as administrator", then retry.' },
+  { problem: "Model response latency is high", fix: "Free-tier models have higher latency. DeepSeek V4 Flash offers the lowest latency among paid models. GLM 5.2 and Kimi K2.7 trade speed for quality." }
+];
+
+const CHEATSHEET = [
+  { what: "Start 9Router", cmd: "9router", where: "Terminal" },
+  { what: "Open dashboard", cmd: "localhost:20128", where: "Browser" },
+  { what: "Start OpenCode", cmd: "opencode", where: "Terminal (2nd window)" },
+  { what: "Check Node version", cmd: "node --version", where: "Terminal" },
+  { what: "Update 9Router", cmd: "npm install -g 9router", where: "Terminal" },
+  { what: "Update OpenCode", cmd: "npm install -g opencode-ai@latest", where: "Terminal" },
+  { what: "List models", cmd: "/models", where: "Inside OpenCode" },
+  { what: "Undo last change", cmd: "/undo", where: "Inside OpenCode" },
+  { what: "Switch modes", cmd: "Tab key", where: "Inside OpenCode" }
+];
+
+
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+let checkedState = {};
+let expandedPhase = PHASES[0].id;
+
+function toggleCheck(id) {
+  checkedState[id] = !checkedState[id];
+  render();
+}
+function togglePhase(id) {
+  expandedPhase = expandedPhase === id ? null : id;
+  render();
+}
+function copyText(btn) {
+  const text = btn.getAttribute('data-copy');
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+
+// ═══════════════════════════════════════════════════
+// RENDER HELPERS
+// ═══════════════════════════════════════════════════
+function svgCheck() {
+  return '<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+}
+function svgChevron() {
+  return '<svg class="phase-chevron" width="18" height="18" viewBox="0 0 20 20"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+}
+
+function renderCallout(type, text) {
+  const icons = {
+    info: '<svg class="callout-icon" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="4.5" r="1"/><rect x="7" y="7" width="2" height="5" rx="0.5"/><path fill-rule="evenodd" d="M8 1a7 7 0 100 14A7 7 0 008 1zM0 8a8 8 0 1116 0A8 8 0 010 8z"/></svg>',
+    success: '<svg class="callout-icon" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M8 1a7 7 0 100 14A7 7 0 008 1zM0 8a8 8 0 1116 0A8 8 0 010 8z"/><path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>',
+    warn: '<svg class="callout-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l7 13H1L8 1z" fill="none" stroke="currentColor" stroke-width="1.2"/><rect x="7.25" y="6" width="1.5" height="4" rx="0.5"/><circle cx="8" cy="12" r="0.75"/></svg>',
+    error: '<svg class="callout-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l7 13H1L8 1z" fill="none" stroke="currentColor" stroke-width="1.2"/><rect x="7.25" y="6" width="1.5" height="4" rx="0.5"/><circle cx="8" cy="12" r="0.75"/></svg>'
+  };
+  return `<div class="callout ${type}">${icons[type] || ''}<span>${text}</span></div>`;
+}
+
+function renderCmd(command, label, breakdown) {
+  let html = '';
+  if (label) html += `<div class="cmd-label">${label}</div>`;
+  const safeAttr = command.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  html += `<div class="cmd-block"><pre>${esc(command)}</pre><button class="copy-btn" data-copy="${safeAttr}" onclick="copyText(this)">Copy</button></div>`;
+  if (breakdown) {
+    html += '<div class="cmd-breakdown">';
+    breakdown.forEach(b => {
+      html += `<code>${esc(b.piece)}</code><span>${esc(b.meaning)}</span>`;
+    });
+    html += '</div>';
+  }
+  return html;
+}
+
+function renderVisual(v) {
+  if (!v) return '';
+
+  if (v.type === 'icons') {
+    return '<div class="icon-grid">' + v.items.map(it =>
+      `<div class="icon-card"><div class="icon-card-name">${esc(it.name)}</div><div class="icon-card-desc">${esc(it.desc)}</div></div>`
+    ).join('') + '</div>';
+  }
+  if (v.type === 'mockButton') {
+    return `<div class="mock-btn-wrap"><div class="mock-btn" style="background:${v.color}">${esc(v.text)}</div><div class="mock-btn-caption">Approximate button appearance</div></div>`;
+  }
+  if (v.type === 'finder') {
+    return '<div class="finder-options">' + v.options.map((o,i) =>
+      `<div class="finder-opt"><span class="finder-opt-letter">${i===0?'A':'B'}</span><span>${esc(o)}</span></div>`
+    ).join('') + '</div>';
+  }
+  if (v.type === 'wizard') {
+    return '<div class="wizard">' + v.screens.map((s,i) =>
+      `<div class="wizard-row"><div class="wizard-num${s.important?' important':''}">${i+1}</div><div><div class="wizard-screen">${esc(s.screen)}</div><div class="wizard-action${s.important?' important':''}">${esc(s.action)}</div></div></div>`
+    ).join('') + '</div>';
+  }
+  if (v.type === 'priority') {
+    const colors = ['#2563eb','#6366f1','#7c3aed','#9333ea'];
+    return '<div class="priority-list">' + v.items.map(it =>
+      `<div class="priority-item"><div class="priority-rank" style="background:${colors[it.rank-1]||'#6b7280'}">${it.rank}</div><div style="flex:1"><div class="priority-name">${esc(it.name)}</div><div class="priority-desc">${esc(it.desc)}</div></div><span class="priority-tag">${esc(it.tag)}</span></div>`
+    ).join('') + '</div>';
+  }
+  if (v.type === 'envvars') {
+    return v.vars.map(ev => {
+      const safeName = ev.name.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+      const safeVal = ev.value.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+      return `<div class="envvar-block"><div class="envvar-row"><span class="envvar-label">Variable Name</span><button class="copy-btn" data-copy="${safeName}" onclick="copyText(this)">Copy</button></div><div class="envvar-name">${esc(ev.name)}</div><div class="envvar-row"><span class="envvar-label">Variable Value</span><button class="copy-btn" data-copy="${safeVal}" onclick="copyText(this)">Copy</button></div><div class="envvar-value">${esc(ev.value)}</div>${ev.note ? `<div class="envvar-note">${esc(ev.note)}</div>`:''}</div>`;
+    }).join('');
+  }
+  if (v.type === 'costs') {
+    let html = '<div class="costs-table">';
+    v.items.forEach(it => {
+      html += `<div class="cost-row"><span>${esc(it.item)}</span><div><span class="cost-amount${it.cost==='Free'?' free':''}">${esc(it.cost)}</span>${it.note?`<div class="cost-note">${esc(it.note)}</div>`:''}</div></div>`;
+    });
+    html += '<div class="cost-total"><span>Total recurring cost</span><span>$10/month</span></div></div>';
+    return html;
+  }
+  return '';
+}
+
+function esc(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+
+// ═══════════════════════════════════════════════════
+// MAIN RENDER
+// ═══════════════════════════════════════════════════
+function render() {
+  const totalSteps = PHASES.reduce((a,p) => a + p.steps.length, 0);
+  const doneSteps = Object.values(checkedState).filter(Boolean).length;
+  const pct = Math.round((doneSteps / totalSteps) * 100);
+
+  let html = '';
+
+  // Header
+  html += `<div class="header">
+    <div class="header-eyebrow">Setup Guide</div>
+    <h1>AI Development Environment</h1>
+    <p>Configure 9Router and OpenCode on Windows 10. A structured, step-by-step walkthrough — check off each item as you proceed.</p>
+  </div>`;
+
+  // Prerequisites
+  html += `<div class="prereqs">
+    <div class="prereqs-title">Prerequisites</div>
+    <ul>
+      <li>Windows 10 computer with an active internet connection</li>
+      <li>A web browser (Chrome, Edge, or Firefox)</li>
+      <li>A credit or debit card for the OpenCode Go subscription ($5 introductory / $10 per month)</li>
+      <li>Approximately 30–45 minutes of uninterrupted time</li>
+    </ul>
+  </div>`;
+
+  // Progress bar
+  html += `<div class="progress-bar-wrap">
+    <div class="progress-label">
+      <span class="progress-label-title">Overall progress</span>
+      <span class="progress-label-value">${doneSteps} / ${totalSteps} steps &middot; ${pct}%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill${pct===100?' complete':''}" style="width:${pct}%"></div>
+    </div>
+    ${pct===100 ? '<div class="progress-done">Setup complete. All steps verified.</div>' : ''}
+  </div>`;
+
+  // Phases
+  PHASES.forEach((phase, idx) => {
+    const isOpen = expandedPhase === phase.id;
+    const done = phase.steps.every(s => checkedState[s.id]);
+    const phaseDone = phase.steps.filter(s => checkedState[s.id]).length;
+    const pp = Math.round((phaseDone / phase.steps.length) * 100);
+
+    html += `<div class="phase${isOpen?' open':''}">`;
+
+    // Phase header
+    html += `<button class="phase-header" onclick="togglePhase('${phase.id}')">
+      <div class="phase-number${done?' done':''}" style="${done?'':`background:${phase.color}12;color:${phase.color}`}">
+        ${done ? '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' : (idx+1)}
+      </div>
+      <div class="phase-info">
+        <div class="phase-title">
+          ${esc(phase.title)}
+          ${done ? '<span class="phase-done-badge">Complete</span>' : ''}
+        </div>
+        <div class="phase-subtitle">${esc(phase.subtitle)}</div>
+        ${!done ? `<div class="phase-mini-progress"><div class="phase-mini-fill" style="width:${pp}%;background:${phase.color}"></div></div>` : ''}
+      </div>
+      ${svgChevron()}
+    </button>`;
+
+    // Phase body
+    if (isOpen) {
+      html += '<div class="phase-body">';
+      if (phase.explainer) {
+        html += `<div class="explainer" style="border-left-color:${phase.color}">${esc(phase.explainer)}</div>`;
+      }
+      phase.steps.forEach(step => {
+        const isChecked = !!checkedState[step.id];
+        html += `<div class="step${isChecked?' checked':''}">`;
+
+        // Header
+        html += `<div class="step-header" onclick="toggleCheck('${step.id}')">
+          <div class="step-checkbox${isChecked?' checked':''}">${svgCheck()}</div>
+          <div class="step-label">${esc(step.label)}</div>
+        </div>`;
+
+        // Body (hidden when checked)
+        if (!isChecked) {
+          html += '<div class="step-body">';
+          if (step.detail) html += `<p class="step-detail">${esc(step.detail)}</p>`;
+          if (step.substeps) {
+            html += '<ol class="substeps">' + step.substeps.map(s => `<li>${esc(s)}</li>`).join('') + '</ol>';
+          }
+          html += renderVisual(step.visual);
+          if (step.command) html += renderCmd(step.command, step.commandLabel, step.commandBreakdown);
+          if (step.detail2) html += `<p class="step-detail">${esc(step.detail2)}</p>`;
+          if (step.followup) {
+            html += renderCmd(step.followup.command, step.followup.commandLabel);
+            if (step.followup.expect) html += renderCallout('success', step.followup.expect);
+          }
+          if (step.expect) html += renderCallout('success', step.expect);
+          if (step.tip) html += renderCallout(step.warning ? 'warn' : 'info', step.tip);
+          if (step.warning_box) html += renderCallout('error', step.warning_box);
+          if (step.altMethod) {
+            html += `<details class="appendix" style="margin-top:10px">
+              <summary>${esc(step.altMethod.title)}</summary>
+              <div class="appendix-body">
+                <p class="step-detail">${esc(step.altMethod.detail)}</p>
+                ${(step.altMethod.commands||[]).map(c => renderCmd(c)).join('')}
+                ${step.altMethod.then ? `<p class="step-detail">${esc(step.altMethod.then)}</p>` : ''}
+                ${step.altMethod.finalCommand ? renderCmd(step.altMethod.finalCommand) : ''}
+              </div>
+            </details>`;
+          }
+          html += '</div>';
+        }
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+  });
+
+  // Troubleshooting
+  html += `<details class="appendix" style="margin-top:16px">
+    <summary>Troubleshooting Reference</summary>
+    <div class="appendix-body">
+      ${TROUBLESHOOTING.map(t => `<div class="trouble-item"><div class="trouble-problem">${esc(t.problem)}</div><div class="trouble-fix"><strong>Resolution:</strong> ${esc(t.fix)}</div></div>`).join('')}
+    </div>
+  </details>`;
+
+  // Cheat sheet
+  html += `<details class="appendix" style="margin-top:12px">
+    <summary>Quick-Reference Commands</summary>
+    <div class="appendix-body">
+      <table class="cheat-table">
+        <thead><tr><th>Action</th><th>Command</th><th>Context</th></tr></thead>
+        <tbody>
+          ${CHEATSHEET.map(r => `<tr><td>${esc(r.what)}</td><td><code>${esc(r.cmd)}</code></td><td class="cheat-where">${esc(r.where)}</td></tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </details>`;
+
+  // Architecture
+  html += `<div class="arch">
+    <div class="arch-title">System Architecture</div>
+    <div class="arch-flow">
+      <div class="arch-node"><div class="arch-node-label">User</div><div class="arch-node-sub">Writes prompts</div></div>
+      <div class="arch-arrow">\u2192</div>
+      <div class="arch-node"><div class="arch-node-label">OpenCode</div><div class="arch-node-sub">Development tool</div></div>
+      <div class="arch-arrow">\u2192</div>
+      <div class="arch-node"><div class="arch-node-label">9Router</div><div class="arch-node-sub">Model router</div></div>
+      <div class="arch-arrow">\u2192</div>
+      <div class="arch-node"><div class="arch-node-label">AI Models</div><div class="arch-node-sub">DeepSeek, GLM, etc.</div></div>
+    </div>
+  </div>`;
+
+  html += '<div class="footer">Guide generated for internal distribution. All tools referenced are subject to their respective licensing terms.</div>';
+
+  document.getElementById('app').innerHTML = html;
+}
+
+render();
+</script>
+</body>
+</html>
